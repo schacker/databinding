@@ -1,6 +1,6 @@
 /**
  * 定义发布订阅对象
- * 发布者：我能干什么事情
+ * 发布者：我要干什么事情
  * 订阅者：我希望干什么事情
  */
 var PubSub = {
@@ -38,7 +38,7 @@ var Bind = (function(){
         var target = e.target || e.srcElement
         var bindingName = target.getAttribute('lj-binding')
         if (bindingName) {
-            PubSub.publish('ui-binding-event', bindingName, target.value) //发布事件
+            PubSub.publish('ui-binding-event', bindingName, target.value) //发布UI
         }
     }
     var ael = document.addEventListener
@@ -50,13 +50,14 @@ var Bind = (function(){
         ae('keyup', eventHandler)
         ae('change', eventHandler)
     }
-    //订阅事件
+    //订阅MODEL
     PubSub.subscrib('model-binding-event', function(eventName, value){
         var elements = document.querySelectorAll('[lj-binding="' +eventName+ '"]')
         var len = elements.length
         for (var i = 0;i < len;i++) {
             var item = elements[i]
             var elementType = item.tagName.toLowerCase()
+            // 更新UI
             if (elementType === 'input' || elementType === 'textarea' || elementType === 'select') {
                 item.value = value
             } else {
@@ -68,9 +69,9 @@ var Bind = (function(){
         modelName: '',
         initModel: function(modelName){
             this.modelName = modelName
-            PubSub.subscrib('ui-binding-event', function(eventName, value){
+            PubSub.subscrib('ui-binding-event', function(eventName, value){ //订阅UI
                 var attrs = eventName.split('.')
-                eval(attrs[0])[attrs[1]] = value
+                eval(attrs[0])[attrs[1]] = value //更新MODEL
             })
             return Object.create(this)
         },
@@ -80,6 +81,7 @@ var Bind = (function(){
             }
         },
         defineObjProp: function(obj, propName, propValue) {
+            console.log(obj)
             var that = this
             var _value = propValue || ''
             try {
@@ -89,7 +91,7 @@ var Bind = (function(){
                     },
                     set: function(value) {
                         _value = value
-                        PubSub.publish('model-binding-event', that.modelName+'.'+propName, value)
+                        PubSub.publish('model-binding-event', that.modelName+'.'+propName, value) //发布MODEL
                     },
                     enumerable: true,
                     configurable: true
