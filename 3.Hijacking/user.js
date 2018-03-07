@@ -1,5 +1,4 @@
-
-var user = TBinding.initModel('user');
+var user = Bind.initModel('user');
 
 user.loadModelData({
     'name': 'wilber',

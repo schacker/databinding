@@ -9,14 +9,14 @@
           <fieldset>
             <legend>User info form:</legend>
             Name:<br>
-            <input type='text' t-binding="user.name"></input><br/>
+            <input type='text' lj-binding="user.name"></input><br/>
             Age:<br>
-            <input type='text' t-binding="user.age"></input>
+            <input type='text' lj-binding="user.age"></input>
             <button type="button" onclick="user.incAge()">+</button>
             <button type="button" onclick="user.decAge()">-</button>
             <br/>
             Gender:<br>
-            <select t-binding="user.gender">
+            <select lj-binding="user.gender">
                 <option disabled selected value></option>
                 <option value="1">Male</option>
                 <option value="2">Female</option>
@@ -31,15 +31,15 @@
         <strong>
             Name:
         </strong>
-        <label t-binding="user.name"></label><br>
+        <label lj-binding="user.name"></label><br>
          <strong>
             Age:
         </strong>
-        <label t-binding="user.age"></label><br>
+        <label lj-binding="user.age"></label><br>
          <strong>
             Gender:
         </strong>
-        <label t-binding="user.gender"></label><br>
+        <label lj-binding="user.gender"></label><br>
     </body>
 
     <script src="tbinding.js"></script>

@@ -1,119 +1,103 @@
-
-var Pubsub = {
+/**
+ * 定义发布订阅对象
+ * 发布者：我能干什么事情
+ * 订阅者：我希望干什么事情
+ */
+var PubSub = {
     subscrib: function(ev, callback) {
         this._callbacks || (this._callbacks = {});
-        (this._callbacks[ev] || (this._callbacks[ev] = [])).push(callback);
-        
-        return this;        
-    },
+        (this._callbacks[ev] || (this._callbacks[ev] = [])).push(callback) //添加订阅事件的回调
 
+        return this
+    },
     publish: function() {
-        var args = Array.prototype.slice.call(arguments);
-        
-        var ev = args.shift();
-        
-        if(!this._callbacks) return this;
-        if(!this._callbacks[ev]) return this;
-        
-        for(var i = 0; i < this._callbacks[ev].length; i++) {
-            this._callbacks[ev][i].apply(this, args);
+        var args = Array.prototype.slice.call(arguments)
+        var ev = args.shift()
+        var cb = this._callbacks
+        if (!cb) {
+            return this
         }
-        
-        return this;
+        if (!cb[ev]) {
+            return this
+        }
+        var len = cb[ev].length
+        for (var i = 0;i < len;i++) {
+            cb[ev][i].apply(this, args)
+        }
+        return this
     }
 }
 
-
-var TBinding = (function(){
-
-    function pageElementEventHandler(e) {
-        var target = e.target || e.srcElemnt;
-        var fullPropName = target.getAttribute('t-binding');
-
-        if(fullPropName && fullPropName !== '') {
-            Pubsub.publish('ui-update-event', fullPropName, target.value);
+/**
+ * 绑定对象
+ * 特定元素绑定，发布UI更新事件
+ * 订阅数据更新时间
+ */
+var Bind = (function(){
+    function eventHandler(e) {
+        var target = e.target || e.srcElement
+        var bindingName = target.getAttribute('lj-binding')
+        if (bindingName) {
+            PubSub.publish('ui-binding-event', bindingName, target.value) //发布事件
         }
-
     }
-    
-
-    if(document.addEventListener) {
-        document.addEventListener('keyup', pageElementEventHandler, false);
-        document.addEventListener('change', pageElementEventHandler, false);
-    } else {
-        document.attachEvent('onkeyup', pageElementEventHandler);
-        document.attachEvent('onchange', pageElementEventHandler);
-    } 
-
-    Pubsub.subscrib('model-update-event', function(fullPropName, propValue) {   
-        var elements = document.querySelectorAll('[t-binding="' + fullPropName + '"]');
-
-        for(var i = 0, len =elements.length; i < len; i++){
-            var elementType = elements[i].tagName.toLowerCase();
-
-            if(elementType === 'input' || elementType === 'textarea' || elementType === 'select') {
-                elements[i].value = propValue;
+    var ael = document.addEventListener
+    var ae = document.attachEvent
+    if (ael) {
+        ael('keyup', eventHandler, false)
+        ael('change', eventHandler, false)
+    } else if (ae) {
+        ae('keyup', eventHandler)
+        ae('change', eventHandler)
+    }
+    //订阅事件
+    PubSub.subscrib('model-binding-event', function(eventName, value){
+        var elements = document.querySelectorAll('[lj-binding="' +eventName+ '"]')
+        var len = elements.length
+        for (var i = 0;i < len;i++) {
+            var item = elements[i]
+            var elementType = item.tagName.toLowerCase()
+            if (elementType === 'input' || elementType === 'textarea' || elementType === 'select') {
+                item.value = value
             } else {
-                elements[i].innerHTML = propValue;
+                item.innerHTML = value
             }
-
         }
-    });
-
-
+    })
     return {
-        'modelName': '',
-
-        'initModel': function(modelName) {
-            this.modelName = modelName;
-
-            Pubsub.subscrib('ui-update-event', function(fullPropName, propValue) {
-                var propPathArr = fullPropName.split('.');
-
-                eval(propPathArr[0])[propPathArr[1]] = propValue;
-            });
-
-            return Object.create(this);
-        }, 
-
-        'loadModelData': function(modelData) {
-            for(prop in modelData) {
-                this.defineObjProp(this, prop, modelData[prop]);
+        modelName: '',
+        initModel: function(modelName){
+            this.modelName = modelName
+            PubSub.subscrib('ui-binding-event', function(eventName, value){
+                var attrs = eventName.split('.')
+                eval(attrs[0])[attrs[1]] = value
+            })
+            return Object.create(this)
+        },
+        loadModelData: function(modelData) {
+            for (prop in modelData) {
+                this.defineObjProp(this, prop, modelData[prop])
             }
         },
-
-        'defineObjProp': function(obj, propName, propValue) {
-            var self = this;
-
-            var _value = propValue || '';
-
+        defineObjProp: function(obj, propName, propValue) {
+            var that = this
+            var _value = propValue || ''
             try {
                 Object.defineProperty(obj, propName, {
                     get: function() {
-                        return _value; 
+                        return _value
                     },
-
-                    set: function(newValue) {
-                        _value = newValue;
-                        Pubsub.publish('model-update-event', self.modelName + '.' + propName, newValue);
+                    set: function(value) {
+                        _value = value
+                        PubSub.publish('model-binding-event', that.modelName+'.'+propName, value)
                     },
                     enumerable: true,
                     configurable: true
                 });
-
-                obj[propName] = _value;
-            } catch (error) {
-                alert("Browser must be IE8+ !");
+                obj[propName] = _value
+            } catch(e){
+                console.log(e, '浏览器必须IE8+')
             }
         }
-
-        
     }
-
-})();
-
-
-
-
-
-
+}());
