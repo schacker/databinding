@@ -92,7 +92,7 @@
 ![1 3](https://cloud.githubusercontent.com/assets/5880320/18007451/b64c3728-6bd6-11e6-825d-b4940628c4fb.PNG)
     
     
-**完整的代码请参考[Two-way-data-binding:PubSub](https://github.com/WilberTian/Two-way-data-binding)。**
+**完整的代码请参考[Two-way-data-binding:PubSub](https://github.com/schacker/databinding)。**
 
 
     
@@ -141,7 +141,7 @@ Javascript中提供了“Object.defineProperty”方法，通过这个方法可�
 *但是，对于IE8及以下浏览器仍需要使用其它方法来做hack。*
 
 
-**完整的代码请参考[Two-way-data-binding:Hijacking](https://github.com/WilberTian/Two-way-data-binding)。**
+**完整的代码请参考[Two-way-data-binding:Hijacking](https://github.com/schacker/databinding)。**
 
 
 
@@ -185,7 +185,7 @@ Javascript中提供了“Object.defineProperty”方法，通过这个方法可�
 
     }
 
-**完整的代码请参考[Two-way-data-binding:Digest](https://github.com/WilberTian/Two-way-data-binding)。**
+**完整的代码请参考[Two-way-data-binding:Digest](https://github.com/schacker/databinding)。**
     
 
 
