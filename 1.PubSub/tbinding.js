@@ -30,7 +30,7 @@ var TBinding = (function(){
         var target = e.target || e.srcElemnt;
         var fullPropName = target.getAttribute('lj-binding');
 
-        if(fullPropName && fullPropName !== '') {
+        if(fullPropName) {
             Pubsub.publish('ui-binding-event', fullPropName, target.value);
         }
 

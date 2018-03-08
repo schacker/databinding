@@ -12,12 +12,14 @@ var Scope = function() {
             self.watch(function() {
                 return self.str2PropGet(elements[i].getAttribute('ng-model'));
             }, function() {
-                var elementType = elements[i].tagName.toLowerCase();
+                var temp = elements[i]
+                var elementType = temp.tagName.toLowerCase();
+                var modelValue = self.str2PropGet(temp.getAttribute('ng-model'))
 
                 if(elementType === 'input' || elementType === 'textarea' || elementType === 'select') {
-                    elements[i].value = self.str2PropGet(elements[i].getAttribute('ng-model'));
+                    temp.value = modelValue;
                 } else {
-                    elements[i].innerHTML = self.str2PropGet(elements[i].getAttribute('ng-model'));
+                    temp.innerHTML = modelValue;
                 }
             });
         })(i);
