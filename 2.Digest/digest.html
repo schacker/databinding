@@ -2,21 +2,21 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>2-way-binding</title>
+        <title>脏数据检测</title>
     </head>
     <body>
         <form style="width:400px">
           <fieldset>
             <legend>User info form:</legend>
             Name:<br>
-            <input type='text' lj-binding="user.name"></input><br/>
+            <input type='text' ng-model="user.name"></input><br/>
             Age:<br>
-            <input type='text' lj-binding="user.age"></input>
-            <button type="button" onclick="user.incAge()">+</button>
-            <button type="button" onclick="user.decAge()">-</button>
+            <input type='text' ng-model="user.age"></input>
+            <button type="button" onclick="scope.user.incAge()">+</button>
+            <button type="button" onclick="scope.user.decAge()">-</button>
             <br/>
             Gender:<br>
-            <select lj-binding="user.gender">
+            <select ng-model="user.gender">
                 <option disabled selected value></option>
                 <option value="1">Male</option>
                 <option value="2">Female</option>
@@ -31,15 +31,15 @@
         <strong>
             Name:
         </strong>
-        <label lj-binding="user.name"></label><br>
+        <label ng-model="user.name"></label><br>
          <strong>
             Age:
         </strong>
-        <label lj-binding="user.age"></label><br>
+        <label ng-model="user.age"></label><br>
          <strong>
             Gender:
         </strong>
-        <label lj-binding="user.gender"></label><br>
+        <label ng-model="user.gender"></label><br>
     </body>
 
     <script src="tbinding.js"></script>

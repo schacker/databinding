@@ -15,21 +15,21 @@
 - 当model发生改变的时候，触发Model change事件，然后通过响应的事件处理函数更新界面
 - 当界面更新的时候，触发UI change事件， 然后通过相应的事件处理函数更新Model，以及绑定在Model上的其他界面控件
 
-根据这个思路，可以定义'ui-update-event'和'model-update-event'两个事件，然后针对Model和UI分别进行这两个事件订阅和发布。
+根据这个思路，可以定义'ui-binding-event'和'model-binding-event'两个事件，然后针对Model和UI分别进行这两个事件订阅和发布。
 
 
 #### UI更新
-对于所有支持双向绑定的页面控件，当控件的“值”发生改变的时候，就触发'ui-update-event'，然后通过事件处理函数更新Model，以及绑定在Model上的其他界面控件
+对于所有支持双向绑定的页面控件，当控件的“值”发生改变的时候，就触发'ui-binding-event'，然后通过事件处理函数更新Model，以及绑定在Model上的其他界面控件
 
-处理控件“值”的改变，发布“ui-update-event”事件，（这里只处理包含“t-binding”属性的控件）：
+处理控件“值”的改变，发布“ui-binding-event”事件，（这里只处理包含“lj-binding”属性的控件）：
 
     // keyup和change事件处理函数
     function pageElementEventHandler(e) {
         var target = e.target || e.srcElemnt;
-        var fullPropName = target.getAttribute('t-binding');
+        var fullPropName = target.getAttribute('lj-binding');
 
         if(fullPropName && fullPropName !== '') {
-            Pubsub.publish('ui-update-event', fullPropName, target.value);
+            Pubsub.publish('ui-binding-event', fullPropName, target.value);
         }
 
     }
@@ -43,11 +43,11 @@
         document.attachEvent('onchange', pageElementEventHandler);
     } 
     
-另外，对所有包含“t-binding”属性的控件都订阅了“'model-update-event”，也就是当Model变化的时候会收到相应的通知：
+另外，对所有包含“lj-binding”属性的控件都订阅了“'model-binding-event”，也就是当Model变化的时候会收到相应的通知：
 
-    // 订阅model-update-event事件, 根据Model对象的变化更新相关的UI
-    Pubsub.subscrib('model-update-event', function(fullPropName, propValue) {   
-        var elements = document.querySelectorAll('[t-binding="' + fullPropName + '"]');
+    // 订阅model-binding-event事件, 根据Model对象的变化更新相关的UI
+    Pubsub.subscrib('model-binding-event', function(fullPropName, propValue) {   
+        var elements = document.querySelectorAll('[lj-binding="' + fullPropName + '"]');
 
         for(var i = 0, len =elements.length; i < len; i++){
             var elementType = elements[i].tagName.toLowerCase();
@@ -63,18 +63,18 @@
 
 #### Model更新
 
-对于Model这一层，当Model发生改变的时候，会发布“model-update-event”：
+对于Model这一层，当Model发生改变的时候，会发布“model-binding-event”：
 
-	// Model对象更新方法，更新对象的同时发布model-update-event事件
+	// Model对象更新方法，更新对象的同时发布model-binding-event事件
     'updateModelData': function(propName, propValue) {    
         eval(this.modelName)[propName] =propValue;   
-        Pubsub.publish('model-update-event', this.modelName + '.' + propName, propValue);
+        Pubsub.publish('model-binding-event', this.modelName + '.' + propName, propValue);
     }
 
-另外，Model订阅了“ui-update-event”，相应的界面改动会更新Model
+另外，Model订阅了“ui-binding-event”，相应的界面改动会更新Model
 
-    // 订阅ui-update-event事件, 将UI的变化对应的更新Model对象
-    Pubsub.subscrib('ui-update-event', function(fullPropName, propValue) {
+    // 订阅ui-binding-event事件, 将UI的变化对应的更新Model对象
+    Pubsub.subscrib('ui-binding-event', function(fullPropName, propValue) {
         var propPathArr = fullPropName.split('.');
         self.updateModelData(propPathArr[1], propValue);
     });
@@ -92,19 +92,19 @@
 ![1 3](https://cloud.githubusercontent.com/assets/5880320/18007451/b64c3728-6bd6-11e6-825d-b4940628c4fb.PNG)
     
     
-**完整的代码请参考[Two-way-data-binding:PubSub](https://github.com/schacker/databinding)。**
+**完整的代码请参考[databinding:PubSub](https://github.com/schacker/databinding)。**
 
 
     
     
 ### 属性劫持
 
-在“发布/订阅模式”实现双向绑定的例子中，为了保证Model的更新能够发布“model-update-event”，对于Model对象的改变必须通过“updateModelData”方法。     
+在“发布/订阅模式”实现双向绑定的例子中，为了保证Model的更新能够发布“model-binding-event”，对于Model对象的改变必须通过“updateModelData”方法。     
 也就是说，通过Javascript对象字面量直接更新对象就没有办法触发双向绑定。
 
 Javascript中提供了“Object.defineProperty”方法，通过这个方法可以对对象的属性进行定制。
 
-结合“Object.defineProperty”和“发布/订阅模式”，对Model属性的set方法进行重定义，将“model-update-event”事件的发布直接放在Model属性的setter中：
+结合“Object.defineProperty”和“发布/订阅模式”，对Model属性的set方法进行重定义，将“model-binding-event”事件的发布直接放在Model属性的setter中：
 
     'defineObjProp': function(obj, propName, propValue) {
         var self = this;
@@ -117,10 +117,10 @@ Javascript中提供了“Object.defineProperty”方法，通过这个方法可�
                     return _value; 
                 },
                 
-				// 在对象属性的setter中添加model-update-event事件发布动作
+				// 在对象属性的setter中添加model-binding-event事件发布动作
                 set: function(newValue) {
                     _value = newValue;
-                    Pubsub.publish('model-update-event', self.modelName + '.' + propName, newValue);
+                    Pubsub.publish('model-binding-event', self.modelName + '.' + propName, newValue);
                 },
                 enumerable: true,
                 configurable: true
@@ -141,7 +141,7 @@ Javascript中提供了“Object.defineProperty”方法，通过这个方法可�
 *但是，对于IE8及以下浏览器仍需要使用其它方法来做hack。*
 
 
-**完整的代码请参考[Two-way-data-binding:Hijacking](https://github.com/schacker/databinding)。**
+**完整的代码请参考[databinding:Hijacking](https://github.com/schacker/databinding)。**
 
 
 
@@ -185,7 +185,7 @@ Javascript中提供了“Object.defineProperty”方法，通过这个方法可�
 
     }
 
-**完整的代码请参考[Two-way-data-binding:Digest](https://github.com/schacker/databinding)。**
+**完整的代码请参考[databinding:Digest](https://github.com/schacker/databinding)。**
     
 
 

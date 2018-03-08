@@ -50,7 +50,7 @@ var Bind = (function(){
         ae('keyup', eventHandler)
         ae('change', eventHandler)
     }
-    //订阅MODEL
+    //订阅MODEL，数据变化后更新VIEW UI
     PubSub.subscrib('model-binding-event', function(eventName, value){
         var elements = document.querySelectorAll('[lj-binding="' +eventName+ '"]')
         var len = elements.length
